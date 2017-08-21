@@ -7,6 +7,68 @@
 <body>
 <canvas id="draw" width="800" height="800"></canvas>
 <script>
+const canvas = document.querySelector('#draw');
+const ctx = canvas.getContext('2d');
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+ctx.strokeStyle = '#BADA55';
+ctx.lineJoin = 'round';
+ctx.lineCap = 'round';
+// 굵기 조절
+ctx.lineWidth = 0;
+// 색이 겹쳤을 때
+// ctx.globalCompositeOperation = 'multiply';
+
+// 클릭 시, 클릭을 마칠 때 등의 상태를 파악하기 위함
+let isDrawing = false;
+// 클릭의 시작점, 끝점을 파악하기 위함
+let lastX = 0;
+let lastY = 0;
+let hue = 0;
+let direction = true;
+
+function draw(e) {
+  // 마우스가 캔버스 내부에서 그리고 있지 않을 경우 draw 함수 실행하지 않게 함
+  if(!isDrawing) return;
+  console.log('e:', e);
+  // set stroke color
+  ctx.strokeStyle = `hsl(${hue}, 100%, 50%)`;
+  ctx.beginPath();
+  // start from
+  ctx.moveTo(lastX, lastY);
+  // go to
+  ctx.lineTo(e.offsetX, e.offsetY);
+  ctx.stroke();
+  // lastX = e.offsetX;
+  // lastY = e.offsetY;
+  // es6
+  [lastX, lastY] = [e.offsetX, e.offsetY];
+  hue++;
+  // stroke color 조정
+  if ( hue > 360 ) {
+    hue = 0;
+  }
+  // 선 굵기를 조절하기 위해 일정 시점에서 with를 증가시킬지, 감소기킬지 결정
+  if (ctx.lineWidth >= 100 || ctx.lineWidth <= 1) {
+    direction = !direction;
+  }
+  if (direction) {
+    ctx.lineWidth++;
+  } else {
+    ctx.lineWidth--;
+  }
+
+}
+
+canvas.addEventListener('mousemove', draw);
+canvas.addEventListener('mousedown', (e) => {
+  isDrawing = true;
+  [lastX, lastY] = [e.offsetX, e.offsetY];
+});
+canvas.addEventListener('mouseup', () => isDrawing = false);
+canvas.addEventListener('mouseout', () => isDrawing = false);
+
+
 </script>
 
 <style>
